@@ -23,6 +23,7 @@ Cài đặt Ubuntu, Docker, Docker Compose bằng WSL.
 - <img width="1484" height="753" alt="image" src="https://github.com/user-attachments/assets/126170e0-bcc3-42f0-8913-858ba7e7eaef" />
 - <img width="1523" height="825" alt="image" src="https://github.com/user-attachments/assets/b499fb39-0ad0-427f-b8b8-6e5b13a4223d" />
 - <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/5cd53e23-c743-4dc7-9298-5270327f1081" />
+- <img width="1142" height="649" alt="image" src="https://github.com/user-attachments/assets/8096f3d8-ef16-448a-ad63-248c7e7a5b99" />
 - <img width="1907" height="1075" alt="image" src="https://github.com/user-attachments/assets/29e9c4d0-041d-4e8f-ae06-377a70347e05" />
 
 2. Cài đặt các thành phần bằng Docker Compose.
