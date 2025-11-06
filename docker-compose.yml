@@ -1,0 +1,95 @@
+version: "3.8"
+
+services:
+  mariadb:
+    image: mariadb:10.11
+    container_name: mariadb
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: iotdb
+      MYSQL_USER: iotuser
+      MYSQL_PASSWORD: iotpass123
+    volumes:
+      - /mnt/d/webapp-project/docker_data/db:/var/lib/mysql
+    networks:
+      - webnet
+    ports:
+      - "3306:3306"
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mariadb
+      PMA_USER: root
+      PMA_PASSWORD: root123
+    ports:
+      - "8080:80"
+    networks:
+      - webnet
+    depends_on:
+      - mariadb
+
+  nodered:
+    image: nodered/node-red:latest
+    container_name: nodered
+    restart: unless-stopped
+    ports:
+      - "1880:1880"
+    volumes:
+      - /mnt/d/webapp-project/nodered_data:/data
+    networks:
+      - webnet
+
+  influxdb:
+    image: influxdb:2.7
+    container_name: influxdb
+    restart: unless-stopped
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=influx123
+      - DOCKER_INFLUXDB_INIT_ORG=myorg
+      - DOCKER_INFLUXDB_INIT_BUCKET=iot_bucket
+      - INFLUXDB_HTTP_BIND_ADDRESS=:8086
+    volumes:
+      - /mnt/d/webapp-project/docker_data/influx:/var/lib/influxdb2
+    ports:
+      - "8086:8086"
+    networks:
+      - webnet
+
+  grafana:
+    image: grafana/grafana:9.5.10
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: grafana123
+    volumes:
+      - /mnt/d/webapp-project/docker_data/grafana:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - webnet
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - /mnt/d/webapp-project/nginx/conf.d:/etc/nginx/conf.d:ro
+      - /mnt/d/webapp-project/frontend:/var/www/frontend:ro
+    networks:
+      - webnet
+    depends_on:
+      - grafana
+      - nodered
+
+networks:
+  webnet:
+    driver: bridge
