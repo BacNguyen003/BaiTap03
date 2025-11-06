@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <title>IoT Monitor — Latest</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body{font-family:Inter,system-ui,Arial;background:#0f1720;color:#e6eef8;margin:0;padding:24px}
+    .wrap{max-width:980px;margin:0 auto}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+    h1{font-size:20px;margin:0}
+    .card{background:#0b1220;border:1px solid #1f2a37;padding:18px;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.5)}
+    .row{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+    .value{font-size:32px;font-weight:600}
+    .meta{color:#9fb0c7}
+    button{background:#2b6cb0;color:white;padding:8px 12px;border-radius:6px;border:0;cursor:pointer}
+    button:disabled{opacity:.6}
+    .small{font-size:13px;color:#b9cfe8}
+    .grid{display:grid;grid-template-columns:1fr 360px;gap:16px}
+    iframe{width:100%;height:320px;border-radius:6px;border:1px solid #213043}
+    @media(max-width:900px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Hệ thống giám sát IOT — Latest readings</h1>
+      <div>
+        <button id="btnRefresh">Lấy dữ liệu</button>
+        <button id="btnAuto">Auto: OFF</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <div>
+        <div class="card" id="mainCard">
+          <div class="row">
+            <div>
+              <div class="small">Cảm biến</div>
+              <div id="sensorId" class="value">—</div>
+              <div id="unit" class="meta">—</div>
+            </div>
+            <div style="margin-left:auto;text-align:right">
+              <div class="small">Cập nhật</div>
+              <div id="ts" class="meta">—</div>
+              <div id="rawVal" class="small" style="margin-top:6px"></div>
+            </div>
+          </div>
+          <hr style="border:none;border-top:1px solid #14232f;margin:14px 0" />
+          <div class="small">JSON API raw</div>
+          <pre id="raw" style="white-space:pre-wrap;background:#07111a;padding:12px;border-radius:6px;margin-top:8px;color:#bfe1ff"></pre>
+        </div>
+
+        <div style="height:16px"></div>
+
+        <div class="card small">
+          Ghi chú: Nếu trang không load được dữ liệu, kiểm tra Node-RED đang chạy và endpoint:
+          <code>http://localhost:1880/api/latest</code>
+        </div>
+      </div>
+
+      <!-- Grafana iframe (thay UID bằng dashboard/panel của bạn) -->
+      <div>
+        <div class="card small" style="margin-bottom:8px">Biểu đồ lịch sử (Grafana iframe)</div>
+        <!-- Thay URL dưới bằng link embed panel bạn tạo trong Grafana -->
+        <iframe id="grafanaFrame" src="about:blank"></iframe>
+        <div class="small" style="margin-top:8px;color:#9fb0c7">
+          Ghi chú: đổi `GRAFANA_EMBED_URL` trong mã bên dưới thành iframe link chia sẻ từ Grafana.
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const API = 'http://localhost:1880/api/latest'; // <= nếu Node-RED ở máy khác/port khác sửa ở đây
+const grafanaEmbed = 'about:blank'; // <-- thay URL embed của panel Grafana ở đây nếu có
+
+document.getElementById('grafanaFrame').src = grafanaEmbed;
+
+const $btn = document.getElementById('btnRefresh');
+const $auto = document.getElementById('btnAuto');
+const $sensorId = document.getElementById('sensorId');
+const $unit = document.getElementById('unit');
+const $ts = document.getElementById('ts');
+const $raw = document.getElementById('raw');
+const $rawVal = document.getElementById('rawVal');
+
+let autoHandle = null;
+
+async function fetchLatest(){
+  $btn.disabled = true;
+  try{
+    const res = await fetch(API, {cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+    $raw.textContent = JSON.stringify(data, null, 2);
+    if(Array.isArray(data) && data.length){
+      const first = data[0];
+      $sensorId.textContent = first.sensor_id || '—';
+      $unit.textContent = (first.unit ? first.unit : '');
+      $ts.textContent = first.ts ? new Date(first.ts).toLocaleString() : '—';
+      $rawVal.textContent = 'value = ' + (first.value ?? '—');
+    } else {
+      $sensorId.textContent = '—';
+      $unit.textContent = '';
+      $ts.textContent = '—';
+      $rawVal.textContent = '';
+    }
+  }catch(err){
+    $raw.textContent = 'Lỗi: '+err.message;
+    console.error(err);
+  } finally {
+    $btn.disabled = false;
+  }
+}
+
+$btn.addEventListener('click', fetchLatest);
+
+$auto.addEventListener('click', ()=>{
+  if(autoHandle){
+    clearInterval(autoHandle);
+    autoHandle = null;
+    $auto.textContent = 'Auto: OFF';
+    $auto.style.background = '';
+  } else {
+    fetchLatest();
+    autoHandle = setInterval(fetchLatest, 5000);
+    $auto.textContent = 'Auto: ON';
+    $auto.style.background = '#155e75';
+  }
+});
+
+// load lần đầu
+fetchLatest();
+</script>
+</body>
+</html>

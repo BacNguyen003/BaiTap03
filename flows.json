@@ -1,0 +1,361 @@
+[
+    {
+        "id": "0fa5b699c87f1772",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "cb1547c8bdb66642",
+        "type": "MySQLdatabase",
+        "name": "mariadb",
+        "host": "mariadb",
+        "port": "3306",
+        "db": "iot_db",
+        "tz": "+07:00",
+        "charset": "utf8mb4"
+    },
+    {
+        "id": "b34d72aba1658776",
+        "type": "influxdb",
+        "hostname": "127.0.0.1",
+        "port": 8086,
+        "protocol": "http",
+        "database": "database",
+        "name": "",
+        "usetls": false,
+        "tls": "",
+        "influxdbVersion": "2.0",
+        "url": "http://host.docker.internal:8086",
+        "timeout": 10,
+        "rejectUnauthorized": false
+    },
+    {
+        "id": "2eea33cff5359f6a",
+        "type": "mysql",
+        "z": "0fa5b699c87f1772",
+        "mydb": "cb1547c8bdb66642",
+        "name": "",
+        "x": 600,
+        "y": 300,
+        "wires": [
+            [
+                "8327c0ce5d5d6004"
+            ]
+        ]
+    },
+    {
+        "id": "6e2ec59672b1c9aa",
+        "type": "function",
+        "z": "0fa5b699c87f1772",
+        "name": "function 1",
+        "func": "const sensorId = \"temp1\";  // ID cảm biến\nconst value = (20 + Math.random() * 10).toFixed(2); // giá trị ngẫu nhiên\nconst unit = \"°C\";\n\n// Xây dựng câu SQL\nmsg.topic = `\nINSERT INTO latest_readings(sensor_id, value, unit)\nVALUES (${JSON.stringify(sensorId)}, ${value}, ${JSON.stringify(unit)})\nON DUPLICATE KEY UPDATE \n    value = ${value}, \n    unit = ${JSON.stringify(unit)}, \n    ts = CURRENT_TIMESTAMP;\n`;\n\n// (Tùy chọn) In ra câu SQL để kiểm tra trong Debug tab\nnode.warn(\"Generated SQL: \" + msg.topic);\n\n// Trả về message để node SQL thực thi\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 300,
+        "wires": [
+            [
+                "2eea33cff5359f6a"
+            ]
+        ]
+    },
+    {
+        "id": "02ba89438f7d493e",
+        "type": "inject",
+        "z": "0fa5b699c87f1772",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 220,
+        "y": 300,
+        "wires": [
+            [
+                "6e2ec59672b1c9aa"
+            ]
+        ]
+    },
+    {
+        "id": "8327c0ce5d5d6004",
+        "type": "debug",
+        "z": "0fa5b699c87f1772",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 820,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "17d491adae2b6f03",
+        "type": "http in",
+        "z": "0fa5b699c87f1772",
+        "name": "",
+        "url": "/api/latest",
+        "method": "get",
+        "upload": false,
+        "skipBodyParsing": false,
+        "swaggerDoc": "",
+        "x": 240,
+        "y": 480,
+        "wires": [
+            [
+                "b3a13787ba2843ca"
+            ]
+        ]
+    },
+    {
+        "id": "b3a13787ba2843ca",
+        "type": "function",
+        "z": "0fa5b699c87f1772",
+        "name": "function 2",
+        "func": "// Tạo dữ liệu giả lập (sai trước đây vì toFixed trả về string)\nconst sensorId = \"temp1\";\nconst value = Number((20 + Math.random() * 10).toFixed(2)); // -> Number, không phải string\nconst unit = \"°C\";\n\n// Format cho influxdb out (node v2 thường chấp nhận mảng object)\nmsg.payload = [\n  {\n    measurement: \"sensor_data\",     // tên measurement\n    tags: { sensor: sensorId },     // tag (tuỳ bạn đặt)\n    fields: { value: value },       // đảm bảo đây là Number\n    // timestamp: new Date().toISOString() // tuỳ chỉnh nếu cần\n  }\n];\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 480,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c2bd4072efce7d92",
+        "type": "http response",
+        "z": "0fa5b699c87f1772",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 670,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "ece8cbcd96e14f6c",
+        "type": "function",
+        "z": "0fa5b699c87f1772",
+        "name": "function 3",
+        "func": "const value = Number((20 + Math.random() * 10).toFixed(2));\n\nmsg.payload = [\n    {\n        measurement: \"sensor_data\",\n        tags: {\n            sensor: \"temp1\",\n            unit: \"°C\"\n        },\n        fields: {\n            value: value        // field đúng kiểu number\n        }\n    }\n];\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 600,
+        "wires": [
+            [
+                "95c8031a21bd70df",
+                "f903b5a8f2007bdb"
+            ]
+        ]
+    },
+    {
+        "id": "2b5a04a5012c27d3",
+        "type": "inject",
+        "z": "0fa5b699c87f1772",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 240,
+        "y": 600,
+        "wires": [
+            [
+                "ece8cbcd96e14f6c"
+            ]
+        ]
+    },
+    {
+        "id": "95c8031a21bd70df",
+        "type": "debug",
+        "z": "0fa5b699c87f1772",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 600,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "f903b5a8f2007bdb",
+        "type": "influxdb out",
+        "z": "0fa5b699c87f1772",
+        "influxdb": "b34d72aba1658776",
+        "name": "",
+        "measurement": "sensor_data",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "myorg",
+        "bucket": "iot_bucket",
+        "x": 910,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "3da2a2203ba0ca34",
+        "type": "http in",
+        "z": "0fa5b699c87f1772",
+        "name": "",
+        "url": "/api/latest",
+        "method": "get",
+        "upload": false,
+        "skipBodyParsing": false,
+        "swaggerDoc": "",
+        "x": 140,
+        "y": 800,
+        "wires": [
+            [
+                "1e388569832d9785"
+            ]
+        ]
+    },
+    {
+        "id": "07dd035947876654",
+        "type": "function",
+        "z": "0fa5b699c87f1772",
+        "name": "format JSON",
+        "func": "const rows = Array.isArray(msg.payload) ? msg.payload : [];\nif (!rows.length) {\n  msg.statusCode = 404;\n  msg.headers = { 'Content-Type': 'application/json' };\n  msg.payload = { error: 'no_data' };\n  return msg;\n}\n\nconst r = rows[0];\n\nmsg.headers = { 'Content-Type': 'application/json' };\nmsg.payload = {\n  sensor: r.sensor ?? null,\n  value:  r._value,\n  unit:   r.unit ?? null,\n  time:   r._time\n};\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 950,
+        "y": 800,
+        "wires": [
+            [
+                "37a701a4a2c822f0"
+            ]
+        ]
+    },
+    {
+        "id": "37a701a4a2c822f0",
+        "type": "http response",
+        "z": "0fa5b699c87f1772",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 1200,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "48d6659319129f52",
+        "type": "debug",
+        "z": "0fa5b699c87f1772",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 940,
+        "y": 880,
+        "wires": []
+    },
+    {
+        "id": "1252249da6dad165",
+        "type": "influxdb in",
+        "z": "0fa5b699c87f1772",
+        "influxdb": "b34d72aba1658776",
+        "name": "",
+        "query": "",
+        "rawOutput": false,
+        "precision": "",
+        "retentionPolicy": "",
+        "org": "organisation",
+        "x": 610,
+        "y": 800,
+        "wires": [
+            [
+                "07dd035947876654",
+                "48d6659319129f52"
+            ]
+        ]
+    },
+    {
+        "id": "1e388569832d9785",
+        "type": "function",
+        "z": "0fa5b699c87f1772",
+        "name": "function 4",
+        "func": "// Xoá topic để node Influx không cố dùng InfluxQL qua msg.topic\ndelete msg.topic;\n\n// Gửi Flux query qua msg.query (dạng string)\nmsg.query = `\nfrom(bucket: \"iot_bucket\")\n  |> range(start: -24h)\n  |> filter(fn: (r) => r._measurement == \"sensor_data\")\n  |> filter(fn: (r) => r._field == \"value\")\n  |> filter(fn: (r) => r.sensor == \"temp1\")\n  |> last()\n`;\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 800,
+        "wires": [
+            [
+                "1252249da6dad165"
+            ]
+        ]
+    },
+    {
+        "id": "ca7624d2a854f1eb",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-node-mysql": "2.0.0",
+            "node-red-contrib-influxdb": "0.7.0"
+        }
+    }
+]
