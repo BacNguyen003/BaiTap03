@@ -52,7 +52,7 @@ Tạo API Token:
 
 7. Ảnh kết quả trả về:
 - <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/71937dcc-d8b0-4866-a73e-fde1e651b151" />
-Phần này của em htrc có hiện kết quả mà chưa có biểu đồ nhưng nay e ngồi sửa thì hỏng luôn e thầy ạ :(((
+Phần này của em htrc có hiện kết quả mà chưa có biểu đồ nhưng nay e ngồi sửa thì hỏng luôn thầy ạ :(((
 - <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/5f786e57-35c2-404e-abea-f48280a48a3a" />
 # Bài của em vẫn đang thiếu rất nhiều cái nhưng đến hạn nộp mà càng sửa càng lỗi thầy ạ e sẽ cố gắng tìm hiểu và hoàn thiện bài tốt hơn ạ !
 
