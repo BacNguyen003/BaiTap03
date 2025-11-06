@@ -41,10 +41,15 @@ Tạo API Token:
 4. Thiết lập Node-RED
 <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/46d71f4e-dfca-4e0e-be5d-0bbd880fe4f6" />
 
-5. Ảnh debug kết quả trả về:
+5. phpadmin
+- <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/2c419a2c-e893-4811-8bb9-0cca8504f4d1" />
+- <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/477bf8c0-8141-44d6-b3aa-6b0710be46d4" />
+
+6. Ảnh debug kết quả trả về:
 - <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/71937dcc-d8b0-4866-a73e-fde1e651b151" />
 Phần này của em htrc có hiện kết quả mà chưa có biểu đồ nhưng nay e ngồi sửa thì hỏng luôn e thầy ạ :(((
 - <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/5f786e57-35c2-404e-abea-f48280a48a3a" />
+# Bài của em vẫn đang thiếu rất nhiều cái nhưng đến hạn nộp mà càng sửa càng lỗi thầy ạ e sẽ cố gắng tìm hiểu và hoàn thiện bài tốt hơn ạ !
 
    
 
