@@ -49,7 +49,7 @@ Tạo API Token:
 - <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/2c419a2c-e893-4811-8bb9-0cca8504f4d1" />
 - <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/477bf8c0-8141-44d6-b3aa-6b0710be46d4" />
 
-7. Ảnh debug kết quả trả về:
+7. Ảnh kết quả trả về:
 - <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/71937dcc-d8b0-4866-a73e-fde1e651b151" />
 Phần này của em htrc có hiện kết quả mà chưa có biểu đồ nhưng nay e ngồi sửa thì hỏng luôn e thầy ạ :(((
 - <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/5f786e57-35c2-404e-abea-f48280a48a3a" />
